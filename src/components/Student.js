@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import styles from '../styles/student.module.css';
 
 class Student extends Component {
-    constructor(props) {
-        super(props)
-        this.status = { average: 0 };
-    }
 
     averageGrade = (grades) => {
         var sum = 0;
