@@ -7,6 +7,12 @@ function App() {
     const [students, setStudents] = useState([])
     const [hasError, setHasError] = useState(false)
     const [pending, setPending] = useState(true)
+    const [searchName, setSearchName] = useState("")
+    const [searchResults, setSearchResults] = useState([])
+
+    const handleSearchNameChange = (event) => {
+        setSearchName(event.target.value)
+    }
 
     useEffect(() => {
         setHasError(false)
@@ -24,19 +30,27 @@ function App() {
 
     }, [])
 
+    useEffect(() => {
+        const results = students.filter(student => {
+            return (student.firstName + " " + student.lastName).toLowerCase().includes(searchName.toLowerCase())
+        })
+        setSearchResults(results)
+       
+    }, [searchName, students])
+
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 container">
             <div id="content" className="p-0 w-75 card">
                 <div className="px-2">
-                    <input placeholder="Search by name" type="text" className="border-bottom form-control" />
+                    <input placeholder="Search by name" type="text" className="border-bottom form-control" onChange={handleSearchNameChange} />
                     <input placeholder="Search by tag" type="text" className="border-bottom form-control" />
                 </div>
                 { hasError && (<div>Error</div>) }
                 { pending && (<div>Loading...</div>) }
-                { !hasError && !pending && students.length === 0 && (<div>No Students</div>) }
+                { !hasError && !pending && searchResults.length === 0 && (<div>No Students</div>) }
                 { 
-                    !hasError && !pending && students.length > 0 && (
-                        students.map((item, index) => (
+                    !hasError && !pending && searchResults.length > 0 && (
+                        searchResults.map((item, index) => (
                             <Student key={index} data={item} />
                         ))
                     )
