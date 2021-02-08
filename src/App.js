@@ -2,6 +2,7 @@ import './styles/app.css';
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Student from './components/Student';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 function App() {
     const [students, setStudents] = useState([])
@@ -55,20 +56,22 @@ function App() {
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 container">
             <div id="content" className="p-0 w-75 card">
-                <div className="px-2">
-                    <input placeholder="Search by name" type="text" className="border-bottom form-control" onChange={handleSearchNameChange} />
-                    <input placeholder="Search by tag" type="text" className="border-bottom form-control" onChange={handleTagNameChange} />
-                </div>
-                { hasError && (<div>Error</div>) }
-                { pending && (<div>Loading...</div>) }
-                { !hasError && !pending && searchResults.length === 0 && (<div>No Students</div>) }
-                { 
-                    !hasError && !pending && searchResults.length > 0 && (
-                        searchResults.map((item, index) => (
-                            <Student key={index} data={item} handleStateChange={handleStateChange} />
-                        ))
-                    )
-                }
+                <Scrollbars>
+                    <div className="px-2">
+                        <input placeholder="Search by name" type="text" className="border-bottom form-control" onChange={handleSearchNameChange} />
+                        <input placeholder="Search by tag" type="text" className="border-bottom form-control" onChange={handleTagNameChange} />
+                    </div>
+                    { hasError && (<div>Error</div>) }
+                    { pending && (<div>Loading...</div>) }
+                    { !hasError && !pending && searchResults.length === 0 && (<div>No Students</div>) }
+                    { 
+                        !hasError && !pending && searchResults.length > 0 && (
+                            searchResults.map((item, index) => (
+                                <Student key={index} data={item} handleStateChange={handleStateChange} />
+                            ))
+                        )
+                    }
+                </Scrollbars>
             </div>
         </div>
     );
