@@ -3,7 +3,17 @@ import styles from '../styles/student.module.css';
 
 class Student extends Component {
 
-    averageGrade = (grades) => {
+    constructor(props) {
+        super(props)
+        this.onKeyUp = this.onKeyUp.bind(this)
+        this.onInputChange = this.onInputChange.bind(this)
+        this.state = { 
+            tagValue: "",
+            tags: []
+        }
+    }
+
+    averageGrade(grades){
         var sum = 0;
         grades.forEach(element => {
             sum += parseFloat(element);
@@ -11,6 +21,25 @@ class Student extends Component {
      
         let aver = sum / grades.length;
         return (aver).toFixed(3);
+    }
+
+    onKeyUp(event){ 
+        if (event.charCode === 13) {
+            this.setState(state => {
+                let taglist = [...state.tags, event.target.value]
+                return {
+                    tagValue: "",
+                    tags: taglist
+                }
+            }, ()=> {
+                this.props.handleStateChange(this.props.data.id, this.state.tags)
+            }) 
+        }
+
+    }
+
+    onInputChange(event){
+        this.setState({ tagValue: event.target.value })
     }
 
     render() {
@@ -27,8 +56,16 @@ class Student extends Component {
                         <p className={styles.privateInfo}>Company: {this.props.data.company}</p>
                         <p className={styles.privateInfo}>Skill: {this.props.data.skill}</p>
                         <p className={styles.privateInfo}>Average: {this.averageGrade(this.props.data.grades)}%</p>
+                        <div>
+                        {   this.props.data.tags.length > 0 && (
+                                this.props.data.tags.map((item, index) => (
+                                    <span key={index} className="badge badge-secondary mr-2" style={{fontWeight: "400", fontSize: "16px"}}>{item}</span>
+                                ))
+                            )
+                        }
+                        </div>
                         <div className="mt-2">
-                            <input placeholder="Add a tag" type="text" className="border-bottom form-control" />
+                            <input placeholder="Add a tag" type="text" className="border-bottom form-control" value={this.state.tagValue} onChange={this.onInputChange} onKeyPress={this.onKeyUp}/>
                         </div>
                     </div>
                 </div>

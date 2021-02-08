@@ -8,10 +8,22 @@ function App() {
     const [hasError, setHasError] = useState(false)
     const [pending, setPending] = useState(true)
     const [searchName, setSearchName] = useState("")
+    const [searchTag, setSearchTag] = useState("")
     const [searchResults, setSearchResults] = useState([])
 
     const handleSearchNameChange = (event) => {
         setSearchName(event.target.value)
+    }
+
+    const handleTagNameChange = (event) => {
+        setSearchTag(event.target.value)
+    }
+
+    const handleStateChange = (id, tags) => {
+        let studentsList = {}
+        Object.assign(studentsList, students)
+        studentsList[id - 1] = { ...studentsList[id - 1], tags}
+        setStudents(studentsList)
     }
 
     useEffect(() => {
@@ -20,9 +32,11 @@ function App() {
         try {
             axios.get(`https://api.hatchways.io/assessment/students`)
             .then(res => {
-                setStudents(res.data.students)
+                setStudents(res.data.students.map(student => ({...student, tags: []})))
+                setPending(false)
+                setHasError(false)
             })
-            setPending(false)
+            
         } catch(err) {
             setHasError(true)
             setPending(false)
@@ -31,19 +45,19 @@ function App() {
     }, [])
 
     useEffect(() => {
-        const results = students.filter(student => {
-            return (student.firstName + " " + student.lastName).toLowerCase().includes(searchName.toLowerCase())
+        const results = Object.values(students).filter(student => {
+            return (student.firstName + " " + student.lastName).toLowerCase().includes(searchName.toLowerCase()) && (searchTag === "" ? true: student.tags.includes(searchTag))
         })
         setSearchResults(results)
        
-    }, [searchName, students])
+    }, [searchName, searchTag, students])
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 container">
             <div id="content" className="p-0 w-75 card">
                 <div className="px-2">
                     <input placeholder="Search by name" type="text" className="border-bottom form-control" onChange={handleSearchNameChange} />
-                    <input placeholder="Search by tag" type="text" className="border-bottom form-control" />
+                    <input placeholder="Search by tag" type="text" className="border-bottom form-control" onChange={handleTagNameChange} />
                 </div>
                 { hasError && (<div>Error</div>) }
                 { pending && (<div>Loading...</div>) }
@@ -51,7 +65,7 @@ function App() {
                 { 
                     !hasError && !pending && searchResults.length > 0 && (
                         searchResults.map((item, index) => (
-                            <Student key={index} data={item} />
+                            <Student key={index} data={item} handleStateChange={handleStateChange} />
                         ))
                     )
                 }
